@@ -59,6 +59,8 @@ services:
 
   # Tarefas periódicas (expirar pedidos, enviar lembretes etc.), a cada 5 minutos.
   cron:
+    build:
+      context: ../..
     image: pretix-fork:local
     restart: unless-stopped
     env_file:
