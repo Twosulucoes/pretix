@@ -70,7 +70,7 @@ RUN chmod +x /usr/local/bin/pretix && \
     rm -f pretix.cfg &&  \
     mkdir -p data && \
     chown -R pretixuser:pretixuser /pretix /data data &&  \
-    sudo -u pretixuser make production
+    sudo -u pretixuser env PRETIX_LANGUAGES_ALLOW_INCUBATING=pt-br make production
 
 USER pretixuser
 VOLUME ["/etc/pretix", "/data"]
