@@ -34,7 +34,9 @@ services:
     image: pretix-fork:local
     restart: unless-stopped
     command: all
-    env_file: .env
+    env_file:
+      - path: .env
+        required: false
     environment: &pretix_env
       PRETIX_DATABASE_BACKEND: postgresql
       PRETIX_DATABASE_NAME: pretix
@@ -59,7 +61,9 @@ services:
   cron:
     image: pretix-fork:local
     restart: unless-stopped
-    env_file: .env
+    env_file:
+      - path: .env
+        required: false
     environment: *pretix_env
     entrypoint: ["/bin/sh", "-c", "while true; do pretix cron; sleep 300; done"]
     volumes:
