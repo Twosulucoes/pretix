@@ -430,11 +430,11 @@ msgstr "Pressione Ctrl+C para copiar!"
 
 #: pretix/static/pretixcontrol/js/ui/checkinrules/App.vue
 msgid "Edit"
-msgstr ""
+msgstr "Editar"
 
 #: pretix/static/pretixcontrol/js/ui/checkinrules/App.vue
 msgid "Visualize"
-msgstr ""
+msgstr "Visualizar"
 
 #: pretix/static/pretixcontrol/js/ui/checkinrules/App.vue
 msgid ""
@@ -442,10 +442,13 @@ msgid ""
 "or variations are not contained in any of your rule parts so people with "
 "these tickets will not get in:"
 msgstr ""
+"Sua regra sempre filtra por produto ou variação, mas os seguintes produtos "
+"ou variações não estão contidos em nenhuma parte da regra, portanto pessoas "
+"com esses ingressos não conseguirão entrar:"
 
 #: pretix/static/pretixcontrol/js/ui/checkinrules/App.vue
 msgid "Please double-check if this was intentional."
-msgstr ""
+msgstr "Verifique se isso foi intencional."
 
 #: pretix/static/pretixcontrol/js/ui/checkinrules/constants.ts
 msgid "All of the conditions below (AND)"
@@ -1229,22 +1232,18 @@ msgstr "Dezembro"
 #~ msgstr "Ler QR"
 
 #, fuzzy
-#~| msgid "Check-in QR"
 #~ msgid "Check-in result"
 #~ msgstr "QR Check-in"
 
 #, fuzzy
-#~| msgid "Nein"
 #~ msgid "in"
 #~ msgstr "Não"
 
 #, fuzzy
-#~| msgid "None"
 #~ msgid "on"
 #~ msgstr "Nenhum"
 
 #, fuzzy
-#~| msgid "Others"
 #~ msgid "the"
 #~ msgstr "Outros"
 
