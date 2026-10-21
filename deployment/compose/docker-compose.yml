@@ -1,0 +1,96 @@
+# pretix com Docker Compose: banco PostgreSQL, Redis, o pretix e, em produção, o Caddy para HTTPS.
+# Instruções em LEIAME.md.
+
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pretix
+      POSTGRES_USER: pretix
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pretix -d pretix"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  pretix:
+    build:
+      context: ../..
+    image: pretix-fork:local
+    restart: unless-stopped
+    command: all
+    env_file:
+      - path: .env
+        required: false
+    environment: &pretix_env
+      PRETIX_DATABASE_BACKEND: postgresql
+      PRETIX_DATABASE_NAME: pretix
+      PRETIX_DATABASE_USER: pretix
+      PRETIX_DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      PRETIX_DATABASE_HOST: postgres
+      PRETIX_REDIS_LOCATION: redis://redis:6379/0
+      PRETIX_REDIS_SESSIONS: "true"
+      PRETIX_CELERY_BROKER: redis://redis:6379/1
+      PRETIX_CELERY_BACKEND: redis://redis:6379/2
+    volumes:
+      - pretix_data:/data
+    ports:
+      - "127.0.0.1:${PRETIX_PORT:-8000}:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Tarefas periódicas (expirar pedidos, enviar lembretes etc.), a cada 5 minutos.
+  cron:
+    build:
+      context: ../..
+    image: pretix-fork:local
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment: *pretix_env
+    entrypoint: ["/bin/sh", "-c", "while true; do pretix cron; sleep 300; done"]
+    volumes:
+      - pretix_data:/data
+    depends_on:
+      - pretix
+
+  # Só sobe com "--profile producao": recebe o tráfego da internet e emite o certificado HTTPS.
+  caddy:
+    image: caddy:2
+    profiles: ["producao"]
+    restart: unless-stopped
+    environment:
+      PRETIX_DOMAIN: ${PRETIX_DOMAIN:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on:
+      - pretix
+
+volumes:
+  postgres_data:
+  redis_data:
+  pretix_data:
+  caddy_data:
